@@ -43,7 +43,24 @@ func flipDisburse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	amount := r.FormValue("amount") // returns string
+	amount := r.FormValue("idempotency-key") // returns string
+	fmt.Println(amount)
+
+	resp := disbursement.Inquiry()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusUnprocessableEntity) // optional if 200
+	json.NewEncoder(w).Encode(resp)
+}
+
+func flipInquiry(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		return
+	}
+
+	amount := r.FormValue("idempotency-key") // returns string
 
 	resp := disbursement.Disburse(amount)
 
@@ -72,6 +89,7 @@ func main() {
 	flip.HandleFunc("/echo", flipEchoHandler).Methods("POST")
 	flip.HandleFunc("/v2/disbursement/bank-account-inquiry", flipEchoHandler).Methods(http.MethodPost)
 	flip.HandleFunc("/v3/special-disbursement", flipDisburse).Methods(http.MethodPost)
+	flip.HandleFunc("/v3/get-disbursement", flipDisburse).Methods(http.MethodPost)
 
 	port := "0.0.0.0:3131"
 	fmt.Println("Server running on", port)
