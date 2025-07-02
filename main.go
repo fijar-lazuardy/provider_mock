@@ -89,7 +89,7 @@ func main() {
 	flip.HandleFunc("/echo", flipEchoHandler).Methods("POST")
 	flip.HandleFunc("/v2/disbursement/bank-account-inquiry", flipEchoHandler).Methods(http.MethodPost)
 	flip.HandleFunc("/v3/special-disbursement", flipDisburse).Methods(http.MethodPost)
-	flip.HandleFunc("/v3/get-disbursement", flipInquiry).Methods(http.MethodPost)
+	flip.HandleFunc("/v3/get-disbursement", flipInquiry).Methods(http.MethodGet)
 
 	port := "0.0.0.0:3131"
 	fmt.Println("Server running on", port)
