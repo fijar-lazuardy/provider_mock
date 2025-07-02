@@ -36,14 +36,8 @@ func flipMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func flipDisburse(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Failed to parse form", http.StatusBadRequest)
-		return
-	}
-
-	amount := r.FormValue("idempotency-key") // returns string
+func flipInquiry(w http.ResponseWriter, r *http.Request) {
+	amount := r.URL.Query().Get("idempotency-key")
 	fmt.Println(amount)
 
 	resp := disbursement.Inquiry()
@@ -53,7 +47,7 @@ func flipDisburse(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func flipInquiry(w http.ResponseWriter, r *http.Request) {
+func flipDisburse(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "Failed to parse form", http.StatusBadRequest)
