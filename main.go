@@ -72,10 +72,14 @@ func flipValidateAccount(w http.ResponseWriter, r *http.Request) {
 func jackValidateAccount(w http.ResponseWriter, r *http.Request) {
 	account_number := r.URL.Query().Get("account_number")
 	bank_name := r.URL.Query().Get("bank_name")
-	payload := map[string]string{
-		"account_number": account_number,
-		"bank_name":      bank_name,
-		"account_name":   randomdata.FullName(randomdata.RandomGender),
+	payload := map[string]any{
+		"status": 200,
+		"data": map[string]any{
+			"id":           randomdata.Alphanumeric(20), // or generate your own
+			"account_no":   account_number,
+			"bank_name":    bank_name,
+			"account_name": randomdata.FullName(randomdata.RandomGender),
+		},
 	}
 
 	jsonBytes, err := json.Marshal(payload)
