@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"provider_mock/disbursement"
 
+	"github.com/Pallinder/go-randomdata"
 	"github.com/gorilla/mux"
 )
 
@@ -68,6 +69,26 @@ func flipValidateAccount(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Echo: %s", string(body))
 }
 
+func jackValidateAccount(w http.ResponseWriter, r *http.Request) {
+	account_number := r.URL.Query().Get("account_number")
+	bank_name := r.URL.Query().Get("bank_name")
+	payload := map[string]string{
+		"account_number": account_number,
+		"bank_name":      bank_name,
+		"account_name":   randomdata.FullName(randomdata.RandomGender),
+	}
+
+	jsonBytes, err := json.Marshal(payload)
+	if err != nil {
+		http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
+		return
+	}
+
+	// If you want to return it:
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonBytes)
+}
+
 func main() {
 	r := mux.NewRouter()
 
@@ -84,6 +105,9 @@ func main() {
 	flip.HandleFunc("/v2/disbursement/bank-account-inquiry", flipEchoHandler).Methods(http.MethodPost)
 	flip.HandleFunc("/v3/special-disbursement", flipDisburse).Methods(http.MethodPost)
 	flip.HandleFunc("/v3/get-disbursement", flipInquiry).Methods(http.MethodGet)
+
+	jack := r.PathPrefix("/jack").Subrouter()
+	jack.HandleFunc("/validation_bank_account", jackValidateAccount).Methods(http.MethodGet)
 
 	port := "0.0.0.0:3131"
 	fmt.Println("Server running on", port)
