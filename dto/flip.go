@@ -11,6 +11,17 @@ type FlipErrorResponse struct {
 	Errors []FlipErrorAttribute `json:"errors"`
 }
 
+type FlipErrorAttributeV2 struct {
+	Attribute string `json:"attribute"`
+	Code      int       `json:"code"`
+	Message   string `json:"message"`
+}
+
+type FlipErrorResponseV2 struct {
+	Code   string                   `json:"code"`
+	Errors []FlipErrorAttributeV2 `json:"errors"`
+}
+
 const (
 	FlipErrUndefined                   string = "999"
 	FlipErrRequiredAttribute           string = "1001"
@@ -52,4 +63,3 @@ const (
 	FlipErrNonAlphanumeric             string = "2004"
 	FlipErrBelowBankMinimumAmount      string = "2005"
 )
-

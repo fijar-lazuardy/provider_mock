@@ -100,6 +100,9 @@ func Disburse(Amount string) (response dto.FlipErrorResponse) {
 	return
 }
 
-func Inquiry() (response dto.FlipErrorResponse) {
-	return dto.FlipErrorResponse{Code: dto.FlipErrDisbursementIdemKeyNotFound, Errors: []dto.FlipErrorAttribute{{Attribute: "", Code: dto.FlipErrDisbursementIdemKeyNotFound, Message: ""}}}
+//	func Inquiry() (response dto.FlipErrorResponse) {
+//		return dto.FlipErrorResponse{Code: dto.FlipErrDisbursementIdemKeyNotFound, Errors: []dto.FlipErrorAttribute{{Attribute: "", Code: dto.FlipErrDisbursementIdemKeyNotFound, Message: ""}}}
+//	}
+func Inquiry() (response dto.FlipErrorResponseV2) {
+	return dto.FlipErrorResponseV2{Code: dto.FlipErrDisbursementIdemKeyNotFound, Errors: []dto.FlipErrorAttributeV2{{Attribute: "", Code: 1073, Message: ""}}}
 }
