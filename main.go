@@ -60,13 +60,23 @@ func flipDisburse(w http.ResponseWriter, r *http.Request) {
 	resp := disbursement.Disburse(amount)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusUnprocessableEntity) // optional if 200
+	w.WriteHeader(http.StatusInternalServerError) // optional if 200
 	json.NewEncoder(w).Encode(resp)
 }
 
 func flipValidateAccount(w http.ResponseWriter, r *http.Request) {
-	body, _ := io.ReadAll(r.Body)
-	fmt.Fprintf(w, "Echo: %s", string(body))
+	data := map[string]string{
+		"bank_code":          "bri",
+		"account_number":     "0013000397",
+		"account_holder":     "Dummy Name",
+		"status":             "SUCCESS",
+		"inquiry_key":        "",
+		"is_virtual_account": "false", // must be string, since map is map[string]string
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK) // optional if 200
+	json.NewEncoder(w).Encode(data)
+
 }
 
 func jackValidateAccount(w http.ResponseWriter, r *http.Request) {
@@ -106,9 +116,10 @@ func main() {
 	flip.HandleFunc("/ping", flipPingHandler).Methods("GET")
 	flip.HandleFunc("/echo", flipEchoHandler).Methods("POST")
 	flip.HandleFunc("/echo", flipEchoHandler).Methods("POST")
-	flip.HandleFunc("/v2/disbursement/bank-account-inquiry", flipEchoHandler).Methods(http.MethodPost)
+	flip.HandleFunc("/v2/disbursement/bank-account-inquiry", flipValidateAccount).Methods(http.MethodPost)
 	flip.HandleFunc("/v3/special-disbursement", flipDisburse).Methods(http.MethodPost)
 	flip.HandleFunc("/v3/get-disbursement", flipInquiry).Methods(http.MethodGet)
+	flip.HandleFunc("/v2/disbursement/bank-account-inquiry", flipValidateAccount).Methods(http.MethodGet)
 
 	jack := r.PathPrefix("/jack").Subrouter()
 	jack.HandleFunc("/validation_bank_account", jackValidateAccount).Methods(http.MethodGet)
