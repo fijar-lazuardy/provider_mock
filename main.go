@@ -109,8 +109,9 @@ func jackDisbursement(w http.ResponseWriter, r *http.Request) {
 		"state":  6,
 	}
 	jsonBytes, _ := json.Marshal(payload)
-	w.Write(jsonBytes)
-	w.WriteHeader(http.StatusInternalServerError)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusInternalServerError) // optional if 200
+	json.NewEncoder(w).Encode(jsonBytes)
 
 }
 
