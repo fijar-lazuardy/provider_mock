@@ -103,6 +103,17 @@ func jackValidateAccount(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonBytes)
 }
 
+func jackDisbursement(w http.ResponseWriter, r *http.Request) {
+	payload := map[string]any{
+		"status": 2,
+		"state":  6,
+	}
+	jsonBytes, _ := json.Marshal(payload)
+	w.Write(jsonBytes)
+	w.WriteHeader(http.StatusInternalServerError)
+
+}
+
 func main() {
 	r := mux.NewRouter()
 
@@ -123,6 +134,7 @@ func main() {
 
 	jack := r.PathPrefix("/jack").Subrouter()
 	jack.HandleFunc("/validation_bank_account", jackValidateAccount).Methods(http.MethodGet)
+	jack.HandleFunc("/transactions", jackDisbursement).Methods(http.MethodPost)
 
 	port := "0.0.0.0:3131"
 	fmt.Println("Server running on", port)
