@@ -147,8 +147,7 @@ func simulateHandle(w http.ResponseWriter, r *http.Request) {
 	payload := map[string]any{
 		"status": "success",
 	}
-	jsonBytes, _ := json.Marshal(payload)
-	json.NewEncoder(w).Encode(jsonBytes)
+	json.NewEncoder(w).Encode(payload)
 
 }
 
