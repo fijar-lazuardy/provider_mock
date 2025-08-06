@@ -126,7 +126,7 @@ func simulateHandle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	baseUrl := "https://rest.doitpay.dev/checkout/v1/simulate/payment"
+	baseUrl := "https://rest.doitpay.dev/checkout/v1/public/simulate"
 	bodyRequest := map[string]interface{}{
 		"amount":       amountInt,
 		"reference_id": ref_id,
