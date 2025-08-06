@@ -1,12 +1,16 @@
 package main
 
 import (
+	"bytes"
+	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"provider_mock/disbursement"
+	"strconv"
 
 	"github.com/Pallinder/go-randomdata"
 	"github.com/gorilla/mux"
@@ -112,6 +116,39 @@ func jackDisbursement(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusInternalServerError) // optional if 200
 	json.NewEncoder(w).Encode(jsonBytes)
+}
+
+func simulateHandle(w http.ResponseWriter, r *http.Request) {
+	ref_id := r.URL.Query().Get("reference_id")
+	amount := r.URL.Query().Get("amount")
+	amountInt, err := strconv.Atoi(amount)
+	if err != nil {
+		return
+	}
+
+	baseUrl := "https://rest.doitpay.dev/checkout/v1/simulate/payment"
+	bodyRequest := map[string]interface{}{
+		"amount":       amountInt,
+		"reference_id": ref_id,
+		"payment_type": "direct_debit",
+	}
+	bodyJson, _ := json.Marshal(bodyRequest)
+	httpReq, err := http.NewRequestWithContext(context.TODO(), http.MethodPost, baseUrl, bytes.NewReader(bodyJson))
+	if err != nil {
+		return
+	}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	httpClient := &http.Client{Transport: tr}
+	httpClient.Do(httpReq)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK) // optional if 200
+	payload := map[string]any{
+		"status": "success",
+	}
+	jsonBytes, _ := json.Marshal(payload)
+	json.NewEncoder(w).Encode(jsonBytes)
 
 }
 
@@ -121,6 +158,7 @@ func main() {
 	// Root routes
 	r.HandleFunc("/", homeHandler).Methods("GET")
 	r.HandleFunc("/health", healthHandler).Methods("GET")
+	r.HandleFunc("/simulate", simulateHandle).Methods(http.MethodGet)
 
 	// Group: /flip
 	flip := r.PathPrefix("/flip").Subrouter()
