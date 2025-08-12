@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"provider_mock/disbursement"
 	"strconv"
+	"time"
 
 	"github.com/Pallinder/go-randomdata"
 	"github.com/gorilla/mux"
@@ -81,6 +82,66 @@ func flipValidateAccount(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK) // optional if 200
 	json.NewEncoder(w).Encode(data)
 
+}
+
+func nobuTransfer(w http.ResponseWriter, r *http.Request) {
+	customResponse := r.Header.Get("CustomeResponse")
+	data := map[string]interface{}{}
+
+	switch customResponse {
+	case "TIMEOUT":
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusGatewayTimeout)
+		json.NewEncoder(w).Encode(data)
+
+	case "PROCESSING":
+		data = map[string]interface{}{
+			"additionalInfo": map[string]interface{}{
+				"beneficiaryAccountName":   "TEST 4",
+				"beneficiaryAccountStatus": "01",
+				"beneficiaryAccountType":   "CACC",
+				"currency":                 "IDR",
+				"customerReference":        fmt.Sprint(randomdata.Number(12)),
+				"transactionDate":          time.Now().Format("2006-01-02T15:04:05-07:00"),
+			},
+			"amount":               map[string]string{"currency": "IDR", "value": "123456.00"},
+			"beneficiaryAccountNo": "510654304",
+			"beneficiaryBankCode":  "SIHBIDJ1",
+			"partnerReferenceNo":   "",
+			"referenceNo":          fmt.Sprint(randomdata.Number(12)),
+			"responseCode":         "2021800",
+			"responseMessage":      "Request has been processed successfully",
+			"sourceAccountNo":      "10110889307",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(w).Encode(data)
+
+	default:
+		data = map[string]interface{}{
+			"additionalInfo": map[string]interface{}{
+				"beneficiaryAccountName":   "TEST 4",
+				"beneficiaryAccountStatus": "01",
+				"beneficiaryAccountType":   "CACC",
+				"currency":                 "IDR",
+				"customerReference":        fmt.Sprint(randomdata.Number(12)),
+				"transactionDate":          time.Now().Format("2006-01-02T15:04:05-07:00"),
+			},
+			"amount":               map[string]string{"currency": "IDR", "value": "123456.00"},
+			"beneficiaryAccountNo": "510654304",
+			"beneficiaryBankCode":  "SIHBIDJ1",
+			"partnerReferenceNo":   "",
+			"referenceNo":          fmt.Sprint(randomdata.Number(12)),
+			"responseCode":         "2001800",
+			"responseMessage":      "Request has been processed successfully",
+			"sourceAccountNo":      "10110889307",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(data)
+	}
 }
 
 func jackValidateAccount(w http.ResponseWriter, r *http.Request) {
@@ -169,6 +230,9 @@ func main() {
 	flip.HandleFunc("/v3/special-disbursement", flipDisburse).Methods(http.MethodPost)
 	flip.HandleFunc("/v3/get-disbursement", flipInquiry).Methods(http.MethodGet)
 	flip.HandleFunc("/v2/disbursement/bank-account-inquiry", flipValidateAccount).Methods(http.MethodGet)
+
+	nobu := r.PathPrefix("/nobu").Subrouter()
+	nobu.HandleFunc("/v1.3/transfer-interbank/", nobuTransfer).Methods(http.MethodPost)
 
 	jack := r.PathPrefix("/jack").Subrouter()
 	jack.HandleFunc("/validation_bank_account", jackValidateAccount).Methods(http.MethodGet)
