@@ -85,7 +85,7 @@ func flipValidateAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func nobuTransfer(w http.ResponseWriter, r *http.Request) {
-	customResponse := r.Header.Get("CustomeResponse")
+	customResponse := r.Header.Get("CustomResponse")
 	data := map[string]interface{}{}
 
 	switch customResponse {
@@ -136,6 +136,52 @@ func nobuTransfer(w http.ResponseWriter, r *http.Request) {
 			"responseCode":         "2001800",
 			"responseMessage":      "Request has been processed successfully",
 			"sourceAccountNo":      "10110889307",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(data)
+	}
+}
+
+func nobuCheckStatus(w http.ResponseWriter, r *http.Request) {
+	customResponse := r.Header.Get("CustomResponse")
+	data := map[string]interface{}{}
+
+	switch customResponse {
+	case "TIMEOUT":
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusGatewayTimeout)
+		json.NewEncoder(w).Encode(data)
+
+	case "NOT FOUND":
+		data = map[string]interface{}{
+			"responseCode":    "4043601",
+			"responseMessage": "Transaction Not Found",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(data)
+
+	default:
+		data = map[string]interface{}{
+			"additionalInfo": map[string]interface{}{
+				"beneficiaryAccountName": "An***n",
+				"referenceNo":            "20220818LFIBIDJ1010O0200001841",
+			},
+			"amount":                     map[string]interface{}{"currency": "IDR", "value": "100001.00"},
+			"beneficiaryAccountNo":       "51******1",
+			"beneficiaryBankCode":        "GN*****A",
+			"latestTransactionStatus":    "00",
+			"originalPartnerReferenceNo": "202507041112213258216820887277",
+			"originalReferenceNo":        "220818001861",
+			"referenceNumber":            "20220818LFIBIDJ1010O0200001841",
+			"responseCode":               "2003600",
+			"responseMessage":            "Request has been processed successfully",
+			"serviceCode":                "18",
+			"sourceAccountNo":            "10********3",
+			"transactionStatusDesc":      "Success",
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -233,6 +279,7 @@ func main() {
 
 	nobu := r.PathPrefix("/nobu").Subrouter()
 	nobu.HandleFunc("/v1.3/transfer-interbank/", nobuTransfer).Methods(http.MethodPost)
+	nobu.HandleFunc("/v1.1/transfer/status/", nobuCheckStatus).Methods(http.MethodPost)
 
 	jack := r.PathPrefix("/jack").Subrouter()
 	jack.HandleFunc("/validation_bank_account", jackValidateAccount).Methods(http.MethodGet)
