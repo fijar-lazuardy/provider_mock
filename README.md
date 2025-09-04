@@ -17,6 +17,6 @@
 
 
 ## TODO
-- [x] Full CI/CD automation
+- [ ] Full CI/CD automation
 - [ ] Make dynamic request, response, url
 
