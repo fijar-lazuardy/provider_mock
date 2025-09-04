@@ -174,7 +174,7 @@ func main() {
 	jack.HandleFunc("/validation_bank_account", jackValidateAccount).Methods(http.MethodGet)
 	jack.HandleFunc("/transactions", jackDisbursement).Methods(http.MethodPost)
 
-	port := "0.0.0.0:313"
+	port := "0.0.0.0:3131"
 
 	fmt.Println("Server is running!!!! on", port)
 
