@@ -17,4 +17,4 @@
 
 
 ## TODO:
-- Full CI/CD automation []
+- Full CI/CD automation [X]
