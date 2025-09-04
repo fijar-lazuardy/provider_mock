@@ -16,5 +16,7 @@
 4. Run `docker compose up -d`
 
 
-## TODO:
-- Full CI/CD automation [X]
+## TODO
+- [x] Full CI/CD automation
+- [ ] Make dynamic request, response, url
+
