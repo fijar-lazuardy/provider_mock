@@ -9,7 +9,9 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"provider_mock/cards"
 	"provider_mock/disbursement"
+	"provider_mock/dto"
 	"strconv"
 	"time"
 
@@ -258,6 +260,74 @@ func simulateHandle(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func createCCDoku(w http.ResponseWriter, r *http.Request) {
+	var request dto.CreateCreditCardPaymentRequest
+
+	defer r.Body.Close()
+	bodyReq, err := io.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(bodyReq, &request)
+	if err != nil {
+		return
+	}
+	resp, err := cards.GenerateDokuCardPaymentPage(r.Context(), request)
+	if err != nil {
+		return
+	}
+
+	jsonBytes, err := json.Marshal(resp)
+	if err != nil {
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK) // optional if 200
+	json.NewEncoder(w).Encode(jsonBytes)
+}
+
+func showDokuCCPage(w http.ResponseWriter, r *http.Request) {
+	invoiceNumber := r.URL.Query().Get("invoice_number")
+	callbackUrl := r.URL.Query().Get("callback_url")
+
+	renderedHTML, err := cards.DokuRenderFormPage(r.Context(), invoiceNumber, callbackUrl)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(renderedHTML))
+}
+
+func dokuProcessCCPayment(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	invoiceNumber := r.FormValue("invoice_number")
+	callbackUrl := r.FormValue("callback_url")
+	order := int64(10000)
+
+	cards.DokuPaymentAndSendCallback(r.Context(), dto.DokuPayment{
+		Amount:        order,
+		InvoiceNumber: invoiceNumber,
+		CallbackURL:   callbackUrl,
+	})
+
+	// ccNumber := r.FormValue("ccNumber")
+	// exp := r.FormValue("exp")
+	// cvv := r.FormValue("cvv")
+	// jsonBytes, err := json.Marshal(resp)
+	// if err != nil {
+	// 	return
+	// }
+	w.WriteHeader(http.StatusOK)
+}
+
 func main() {
 	r := mux.NewRouter()
 
@@ -284,6 +354,10 @@ func main() {
 	jack := r.PathPrefix("/jack").Subrouter()
 	jack.HandleFunc("/validation_bank_account", jackValidateAccount).Methods(http.MethodGet)
 	jack.HandleFunc("/transactions", jackDisbursement).Methods(http.MethodPost)
+
+	doku := r.PathPrefix("/doku").Subrouter()
+	doku.HandleFunc("/credit-card/v1/payment-page", createCCDoku).Methods(http.MethodPost)
+	doku.HandleFunc("/payment-page", showDokuCCPage).Methods(http.MethodGet)
 
 	port := "0.0.0.0:3131"
 
