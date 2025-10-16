@@ -10,6 +10,7 @@ import (
 	"os"
 	"provider_mock/dto"
 	"text/template"
+	"time"
 )
 
 func GenerateDokuCardPaymentPage(ctx context.Context, request dto.CreateCreditCardPaymentRequest) (response dto.CreateCreditCardPaymentResponse, err error) {
@@ -63,7 +64,7 @@ func DokuRenderFormPage(ctx context.Context, invoiceNumber string, callbackUrl s
 
 func DokuPaymentAndSendCallback(ctx context.Context, request dto.DokuPayment) (err error) {
 	httpClient := &http.Client{
-		Timeout: 100,
+		Timeout: 100 * time.Second,
 	}
 
 	callbackUrl, err := base64.URLEncoding.DecodeString(request.CallbackURL)
