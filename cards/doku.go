@@ -75,6 +75,9 @@ func DokuPaymentAndSendCallback(ctx context.Context, request dto.DokuPayment) (e
 			CallbackURL:   request.CallbackURL,
 			Amount:        request.Amount,
 		},
+		Transaction: dto.Transaction{
+			Status: "SUCCESS",
+		},
 	}
 	fmt.Println("sending to:", string(callbackUrl))
 	jsonBody, err := json.Marshal(body)
