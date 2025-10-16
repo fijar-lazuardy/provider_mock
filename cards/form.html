@@ -31,7 +31,7 @@
   <div class="page">
     <div class="card" role="region" aria-label="Credit card payment form">
       <h1>Payment details</h1>
-      <form id="ccForm" action="/process-payment" method="POST" autocomplete="on" novalidate>
+      <form id="ccForm" action="/doku/process-payment" method="POST" autocomplete="on" novalidate>
         <input type="hidden" name="invoice_number" value="{{.InvoiceNumber}}" />
         <input type="hidden" name="callback_url" value="{{.CallbackURL}}" />
 

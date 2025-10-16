@@ -358,6 +358,7 @@ func main() {
 	doku := r.PathPrefix("/doku").Subrouter()
 	doku.HandleFunc("/credit-card/v1/payment-page", createCCDoku).Methods(http.MethodPost)
 	doku.HandleFunc("/payment-page", showDokuCCPage).Methods(http.MethodGet)
+	doku.HandleFunc("/process-payment", dokuProcessCCPayment).Methods(http.MethodPost)
 
 	port := "0.0.0.0:3131"
 

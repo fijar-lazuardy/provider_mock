@@ -25,7 +25,7 @@ func GenerateDokuCardPaymentPage(ctx context.Context, request dto.CreateCreditCa
 			SessionID:     "",
 		},
 		CreditCardPaymentPage: dto.CreditCardPaymentPage{
-			URL: fmt.Sprintf("https://provider.lazu.dev/payment-page?invoice_number=%s&callback_url=%s", request.Order.InvoiceNumber, callbackUrl),
+			URL: fmt.Sprintf("https://provider.lazu.dev/doku/payment-page?invoice_number=%s&callback_url=%s", request.Order.InvoiceNumber, callbackUrl),
 		},
 		AdditionalInfo: dto.AdditionalInfo{},
 	}
