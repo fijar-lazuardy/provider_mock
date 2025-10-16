@@ -303,6 +303,7 @@ func showDokuCCPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func dokuProcessCCPayment(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("processing payment")
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -310,6 +311,7 @@ func dokuProcessCCPayment(w http.ResponseWriter, r *http.Request) {
 
 	invoiceNumber := r.FormValue("invoice_number")
 	callbackUrl := r.FormValue("callback_url")
+	fmt.Println("callback url:", callbackUrl)
 	order := int64(10000)
 
 	cards.DokuPaymentAndSendCallback(r.Context(), dto.DokuPayment{
