@@ -76,8 +76,20 @@ func DokuPaymentAndSendCallback(ctx context.Context, request dto.DokuPayment) (e
 		},
 	}
 	fmt.Println("sending to:", string(callbackUrl))
-	jsonBody, _ := json.Marshal(body)
+	jsonBody, err := json.Marshal(body)
+	if err != nil {
+		fmt.Println("error in marshal")
+		return err
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, string(callbackUrl), bytes.NewBuffer(jsonBody))
-	httpClient.Do(req)
+	if err != nil {
+		fmt.Println("error create request")
+		return err
+	}
+	_, err = httpClient.Do(req)
+	if err != nil {
+		fmt.Println("error doing http request")
+		return err
+	}
 	return
 }
