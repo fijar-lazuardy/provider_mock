@@ -35,7 +35,7 @@ func GenerateDokuCardPaymentPage(ctx context.Context, request dto.CreateCreditCa
 // form.html is in the same directory as this file
 func DokuRenderFormPage(ctx context.Context, invoiceNumber string, callbackUrl string) (string, error) {
 	// Read the HTML template file
-	data, err := os.ReadFile("form.html")
+	data, err := os.ReadFile("cards/form.html")
 	if err != nil {
 		return "", fmt.Errorf("failed to read form.html: %w", err)
 	}
