@@ -66,6 +66,8 @@ func DokuPaymentAndSendCallback(ctx context.Context, request dto.DokuPayment) (e
 		Timeout: 5,
 	}
 
+	callbackUrl, err := base64.URLEncoding.DecodeString(request.CallbackURL)
+
 	body := dto.DokuCreditCardNotifyPaymentRequest{
 		Order: dto.Order{
 			InvoiceNumber: request.InvoiceNumber,
@@ -74,7 +76,7 @@ func DokuPaymentAndSendCallback(ctx context.Context, request dto.DokuPayment) (e
 		},
 	}
 	jsonBody, _ := json.Marshal(body)
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, request.CallbackURL, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, string(callbackUrl), bytes.NewBuffer(jsonBody))
 	httpClient.Do(req)
 	return
 }
