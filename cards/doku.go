@@ -63,7 +63,7 @@ func DokuRenderFormPage(ctx context.Context, invoiceNumber string, callbackUrl s
 
 func DokuPaymentAndSendCallback(ctx context.Context, request dto.DokuPayment) (err error) {
 	httpClient := &http.Client{
-		Timeout: 5,
+		Timeout: 100,
 	}
 
 	callbackUrl, err := base64.URLEncoding.DecodeString(request.CallbackURL)
