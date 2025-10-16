@@ -284,7 +284,7 @@ func createCCDoku(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK) // optional if 200
-	json.NewEncoder(w).Encode(jsonBytes)
+	w.Write(jsonBytes)
 }
 
 func showDokuCCPage(w http.ResponseWriter, r *http.Request) {
