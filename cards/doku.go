@@ -86,9 +86,8 @@ func DokuPaymentAndSendCallback(ctx context.Context, request dto.DokuPayment) (e
 		fmt.Println("error create request")
 		return err
 	}
-	res, err := httpClient.Do(req)
+	_, err = httpClient.Do(req)
 	if err != nil {
-		defer res.Body.Close()
 		fmt.Println("error doing http request", err.Error())
 		return err
 	}
