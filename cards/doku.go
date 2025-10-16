@@ -75,7 +75,7 @@ func DokuPaymentAndSendCallback(ctx context.Context, request dto.DokuPayment) (e
 			Amount:        request.Amount,
 		},
 	}
-	fmt.Println("sending to:", callbackUrl)
+	fmt.Println("sending to:", string(callbackUrl))
 	jsonBody, _ := json.Marshal(body)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, string(callbackUrl), bytes.NewBuffer(jsonBody))
 	httpClient.Do(req)
