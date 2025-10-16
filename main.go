@@ -234,7 +234,7 @@ func simulateHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	baseUrl := "https://rest.doitpay.dev/checkout/v1/public/simulate"
-	bodyRequest := map[string]interface{}{
+	bodyRequest := map[string]any{
 		"amount":       amountInt,
 		"reference_id": ref_id,
 		"payment_type": "direct_debit",
@@ -286,6 +286,8 @@ func main() {
 	jack.HandleFunc("/transactions", jackDisbursement).Methods(http.MethodPost)
 
 	port := "0.0.0.0:3131"
-	fmt.Println("Server running on", port)
+
+	fmt.Println("Server is running!!!! on", port)
+
 	log.Fatal(http.ListenAndServe(port, r))
 }
