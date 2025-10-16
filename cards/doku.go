@@ -3,6 +3,7 @@ package cards
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 )
 
 func GenerateDokuCardPaymentPage(ctx context.Context, request dto.CreateCreditCardPaymentRequest) (response dto.CreateCreditCardPaymentResponse, err error) {
+	callbackUrl := base64.URLEncoding.EncodeToString([]byte(request.Order.CallbackURL))
 	response = dto.CreateCreditCardPaymentResponse{
 		Order: dto.Order{
 			InvoiceNumber: request.Order.InvoiceNumber,
@@ -23,7 +25,7 @@ func GenerateDokuCardPaymentPage(ctx context.Context, request dto.CreateCreditCa
 			SessionID:     "",
 		},
 		CreditCardPaymentPage: dto.CreditCardPaymentPage{
-			URL: fmt.Sprintf("https://provider.lazu.dev/payment-page?invoice_number=%s&callback_url=%s", request.Order.InvoiceNumber, request.Order.CallbackURL),
+			URL: fmt.Sprintf("https://provider.lazu.dev/payment-page?invoice_number=%s&callback_url=%s", request.Order.InvoiceNumber, callbackUrl),
 		},
 		AdditionalInfo: dto.AdditionalInfo{},
 	}
